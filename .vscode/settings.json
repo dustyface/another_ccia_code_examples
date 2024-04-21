@@ -74,6 +74,7 @@
         "algorithm": "cpp",
         "thread": "cpp",
         "iterator": "cpp",
-        "filesystem": "cpp"
+        "filesystem": "cpp",
+        "shared_mutex": "cpp"
     }
 }

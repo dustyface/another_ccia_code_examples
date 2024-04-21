@@ -2,7 +2,7 @@
 #include <thread>
 #include <exception>
 #include <unistd.h>
-#include "mutex.h"
+#include "thread_mgr.h"
 
 const int TEST_VAL = 100;
 

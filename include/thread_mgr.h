@@ -1,6 +1,8 @@
 #ifndef MUTEX_H
 #define MUTEX_H
 
+#include <string>
+
 // movable.cc
 #define MOVE_ONLY(CLS) \
     CLS(CLS&&) noexcept; \
@@ -19,6 +21,14 @@ class Movable {
 };
 Movable f();
 Movable g();
+
+// init_func.cc
+class BackgroundTask {
+    std::string name;
+public:
+    BackgroundTask(const std::string& name_): name(name_) {}
+    void operator()() const;
+};
 
 // dangling_ref.cc
 struct Func;

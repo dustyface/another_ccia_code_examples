@@ -1,5 +1,5 @@
 #include <iostream>
-#include "mutex.h"
+#include "thread_mgr.h"
 
 
 Movable::Movable(int i): p(new int(i)) {

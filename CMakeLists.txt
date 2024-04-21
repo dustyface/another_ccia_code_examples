@@ -22,10 +22,11 @@ include_directories(${CMAKE_SOURCE_DIR}/include)
 # enabling testing
 enable_testing()
 
-add_executable(test_mutex
-  test/test_mutex.cc
-  src/mutex/movable.cc
-  src/mutex/dangling_ref.cc
+add_executable(test_thread_mgr
+  test/test_thread_mgr.cc
+  src/thread_mgr/init_func.cc
+  src/thread_mgr/movable.cc
+  src/thread_mgr/dangling_ref.cc
 )
 
 add_executable(test_share_data
@@ -33,6 +34,7 @@ add_executable(test_share_data
     src/share_data/hierarchial_mutex.cc
     src/share_data/deadlock_mutualjoin.cc
     src/share_data/deadlock_nestedmutex.cc
+    src/share_data/deadlock_stdlock.cc
     src/share_data/lock_guard.cc
     src/share_data/blow_a_hole.cc
     src/share_data/threadunsafe_stack.cc
@@ -40,7 +42,7 @@ add_executable(test_share_data
 )
 
 target_link_libraries(
-    test_mutex
+    test_thread_mgr
     GTest::gtest_main
 )
 target_link_libraries(
@@ -50,5 +52,5 @@ target_link_libraries(
 
 # enable CMake's test google test module and enable test discovery
 include(GoogleTest)
-gtest_discover_tests(test_mutex)
+gtest_discover_tests(test_thread_mgr)
 gtest_discover_tests(test_share_data)

@@ -2,6 +2,7 @@
 #include <iostream>
 #include <thread>
 #include <mutex>
+#include <shared_mutex>
 #include <stack>
 #include "threadsafe_stack.h"
 
@@ -52,8 +53,9 @@ public:
 void swap(X& lhs, X& rhs);
 void run();
 
-// blow_a_hole.cc
+// blow_a_hole.cc, unique_lock.cc
 void test_mutex_hole();
+void test_unqiue_lock();
 
 // threadunsafe_stack.cc
 struct ThreadUnsafeStack {
@@ -65,3 +67,47 @@ struct ThreadUnsafeStack {
 // threadsafe_stack: see threadsafe_stack.h
 // threadsafe_stack.cc
 void test_threadsafe_stack();
+
+// deadlock_stdlock.cc
+
+namespace stdlock {
+
+class some_big_object {
+    std::string* p_str;
+public:
+    some_big_object(const char*);
+    some_big_object(const some_big_object&);
+    some_big_object& operator=(const some_big_object&) = delete;
+    some_big_object& operator=(some_big_object&& other) noexcept;
+    ~some_big_object();
+    // friend declaration for operator<<
+    friend std::ostream& operator<<(std::ostream& os, const some_big_object& obj);
+};
+
+std::ostream& operator<<(std::ostream& os, const some_big_object& obj);
+void swap(some_big_object& lhs, some_big_object& rhs);
+
+class XX {
+    some_big_object data;
+    mutable std::mutex m;
+public:
+    friend void swap(some_big_object& lhs, some_big_object& rhs);
+    XX(const some_big_object&);
+    void swap(XX& lhs, XX& rhs);
+};
+
+} // namespace stdlock
+
+// shared_lock.cc
+// struct dns_entry {
+//     std::string ip;
+//     std::string host;
+// };
+
+// 目前我的clang++ 14.0.0不支持shared_mutex
+// class dns_cache {
+//     std::map<std::string, dns_entry> entries;
+//     mutable std::shared_mutex entry_mutex;
+// public:
+//     dns_entry find_entry(const std::string&) const;
+// };

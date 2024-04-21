@@ -1,5 +1,5 @@
 #include <gtest/gtest.h>
-#include "mutex.h"
+#include "thread_mgr.h"
 
 TEST(test_mutex, test_movable) {
     Movable x(1);

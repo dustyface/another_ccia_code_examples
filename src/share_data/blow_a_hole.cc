@@ -19,10 +19,16 @@ private:
     some_data data_;
     std::mutex m_;
 public:
-    template <typename F>
-    void process_data(F func) {
+    template <typename Func>
+    void process_data(Func func) {
         std::lock_guard<std::mutex> lk(m_);
         func(data_);
+    }
+    template <typename Func>
+    std::unique_lock<std::mutex> process_data_with_lock(Func func) {
+        std::unique_lock<std::mutex> lk(m_);
+        func(data_);
+        return lk;
     }
 };
 
@@ -41,6 +47,20 @@ void test_mutex_hole() {
         x.process_data(malicious_function);
         unprotected->do_something(200, "angel");
     });
+    t1.join();
+    t2.join();
+    std::cout << "check unprotected data: a=" << unprotected->a << ", b=" << unprotected->b << std::endl;
+}
+
+void test_unqiue_lock() {
+    data_wrapper x;
+    auto lambda_func = [&x](int a, std::string b) {
+        // process_data_with_lock 和 do_something 都在mutex保护下
+        std::unique_lock<std::mutex> lk(x.process_data_with_lock(malicious_function));
+        unprotected->do_something(a, b);
+    };
+    std::thread t1(lambda_func, 100, "devil");
+    std::thread t2(lambda_func, 200, "angel");
     t1.join();
     t2.join();
     std::cout << "check unprotected data: a=" << unprotected->a << ", b=" << unprotected->b << std::endl;

@@ -14,6 +14,7 @@ TEST(test_share_data, test_hierarchial_mutex) {
     // }, std::logic_error);
 }
 
+// 故意制造嵌套的mutex调用，导致死锁
 TEST(test_share_data, test_deadlock_nestedmutex) {
     std::cout << "test main thread start" << std::endl;
     X a;
@@ -31,6 +32,16 @@ TEST(test_share_data, test_deadlock_nestedmutex) {
     std::cout << "test main thread end" << std::endl;
 }
 
+TEST(test_share_data, test_stdlock) {
+    stdlock::XX a("hello");
+    stdlock::XX b("std::lock");
+    std::thread t1(&stdlock::XX::swap, &a, std::ref(a), std::ref(b));
+    std::thread t2(&stdlock::XX::swap, &b, std::ref(b), std::ref(a));
+    t1.join();
+    t2.join();
+}
+
+// 故意制造了互相join的情况,导致死锁
 TEST(test_share_data, test_deadlock_mutualjoin) {
     run();
 }
@@ -45,6 +56,11 @@ TEST(test_share_data, test_mutex_hole) {
         test_mutex_hole();
 }
 
+TEST(test_share_data, test_unqiue_lock) {
+    for (int i = 0; i < 10; i++)
+        test_unqiue_lock();
+}
+
 TEST(test_share_data, test_threadunsafe_stack) {
     int a[] = {1, 2, 3, 4, 5 };
     ThreadUnsafeStack stack(a, sizeof(a)/sizeof(a[0]));
@@ -52,7 +68,6 @@ TEST(test_share_data, test_threadunsafe_stack) {
         stack.unsafe_pop();
     });
     // thread接受bind形式的用法, 第一个参数是关联的this对象
-    // 这种形式要求initial function的call signature和thread的第一个参数call signature一致
     std::thread t2(&ThreadUnsafeStack::unsafe_pop, &stack);
     t1.join();
     t2.join();
@@ -63,3 +78,5 @@ TEST(test_share_data, test_threadunsafe_stack) {
 TEST(test_share_data, test_threadsafe_stack) {
     test_threadsafe_stack();
 }
+
+
