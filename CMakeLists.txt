@@ -30,24 +30,35 @@ add_executable(test_thread_mgr
 )
 
 add_executable(test_share_data
-    test/test_share_data.cc
-    src/share_data/hierarchial_mutex.cc
-    src/share_data/deadlock_mutualjoin.cc
-    src/share_data/deadlock_nestedmutex.cc
-    src/share_data/deadlock_stdlock.cc
-    src/share_data/lock_guard.cc
-    src/share_data/blow_a_hole.cc
-    src/share_data/threadunsafe_stack.cc
-    src/share_data/threadsafe_stack.cc
+  test/test_share_data.cc
+  src/share_data/hierarchial_mutex.cc
+  src/share_data/deadlock_mutualjoin.cc
+  src/share_data/deadlock_nestedmutex.cc
+  src/share_data/deadlock_stdlock.cc
+  src/share_data/lock_guard.cc
+  src/share_data/blow_a_hole.cc
+  src/share_data/threadunsafe_stack.cc
+  src/share_data/threadsafe_stack.cc
+)
+
+add_executable(test_synchronize
+  test/test_synchronize.cc
+  src/synchronize/condition_var.cc
+  src/synchronize/threadsafe_queue.cc
+  src/synchronize/packaged_task.cc
 )
 
 target_link_libraries(
-    test_thread_mgr
-    GTest::gtest_main
+  test_thread_mgr
+  GTest::gtest_main
 )
 target_link_libraries(
-    test_share_data
-    GTest::gtest_main
+  test_share_data
+  GTest::gtest_main
+)
+target_link_libraries(
+  test_synchronize
+  GTest::gtest_main
 )
 
 # enable CMake's test google test module and enable test discovery

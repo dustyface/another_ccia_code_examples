@@ -61,6 +61,7 @@ TEST(test_share_data, test_unqiue_lock) {
         test_unqiue_lock();
 }
 
+// 输出是不稳定的, 2个thread调度的次序是不确定的
 TEST(test_share_data, test_threadunsafe_stack) {
     int a[] = {1, 2, 3, 4, 5 };
     ThreadUnsafeStack stack(a, sizeof(a)/sizeof(a[0]));
