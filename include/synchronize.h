@@ -16,3 +16,5 @@ void data_processing_thread();
 void test_threadsafe_queue();
 // packaged_task.cc
 void test_packaged_task();
+// promise.cc
+void test_promise();

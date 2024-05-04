@@ -15,3 +15,7 @@ TEST(test_synchronize, test_threadsafe_queue) {
 TEST(test_synchronize, test_packged_task) {
     test_packaged_task();
 }
+
+TEST(test_synchronize, test_promise) {
+    test_promise();
+}

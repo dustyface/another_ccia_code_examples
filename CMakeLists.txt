@@ -46,6 +46,7 @@ add_executable(test_synchronize
   src/synchronize/condition_var.cc
   src/synchronize/threadsafe_queue.cc
   src/synchronize/packaged_task.cc
+  src/synchronize/promise.cc
 )
 
 target_link_libraries(
