@@ -5,6 +5,7 @@
 #include <thread>
 #include <mutex>
 #include <condition_variable>
+#include <chrono>
 
 struct data_chunk;
 extern std::queue<data_chunk> data_queue;
@@ -12,6 +13,8 @@ extern std::queue<data_chunk> data_queue;
 // condition variable
 void data_preparation_thread();
 void data_processing_thread();
+void data_processing_thread2();
+
 // threadsafe_queue.cc
 void test_threadsafe_queue();
 // packaged_task.cc

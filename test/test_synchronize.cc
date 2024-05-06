@@ -8,6 +8,16 @@ TEST(test_synchronize, test_condition_var) {
     t2.join();
 }
 
+TEST(test_synchronize, test_condition_var2) {
+    std::thread t1([&] {
+        std::cout << "you have 5s to input element" << std::endl;
+        data_preparation_thread();
+    });
+    std::thread t2(data_processing_thread2);
+    t1.join();
+    t2.join();
+}
+
 TEST(test_synchronize, test_threadsafe_queue) {
     test_threadsafe_queue();
 }

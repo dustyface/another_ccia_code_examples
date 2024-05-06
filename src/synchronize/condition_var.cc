@@ -8,6 +8,7 @@ struct data_chunk {
 
 std::mutex mut;
 std::condition_variable  data_cond;
+// shared data
 std::queue<data_chunk> data_queue;
 
 void process_data(data_chunk& data) {
@@ -61,5 +62,24 @@ void data_processing_thread() {
         process_data(data);
         if (is_last_chunk(data))
             break;
+    }
+}
+
+void data_processing_thread2() {
+    data_chunk data;
+    while (true) {
+        auto const timeout = std::chrono::steady_clock::now() +
+            std::chrono::milliseconds(3000);
+        std::unique_lock<std::mutex> lk(mut);
+        if (data_cond.wait_until(lk, timeout) == std::cv_status::timeout) {
+            if (data_queue.empty()) {
+                continue;
+            }
+            data = data_queue.front();
+            data_queue.pop();
+            process_data(data);
+            if (is_last_chunk(data))
+                break;
+        }
     }
 }
