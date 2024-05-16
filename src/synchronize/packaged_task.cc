@@ -13,8 +13,8 @@ bool gui_shutdown_message_received() {
 }
 
 void gui_thread() {
+    std::cout << "gui_thread_id=" << std::this_thread::get_id() << std::endl;
     while(!gui_shutdown_message_received()) {
-        // std::cout << "gui_thread_id=" << std::this_thread::get_id() << std::endl;
         std::packaged_task<std::string()> task;
         {
             std::lock_guard<std::mutex> lk(queue_mut);
@@ -29,7 +29,7 @@ void gui_thread() {
         // 但是, 如果在某一侧使用过get_future, 再次访问已经被move了的object, 则会引发异常
         std::future<std::string> f = task.get_future();
         task();
-        std::cout << f.get() << std::endl;
+        std::cout << "future result=" << f.get() << std::endl;
     }
 }
 
@@ -69,8 +69,11 @@ std::string last_message() {
     return "last msg";
 }
 
+// 检查run task的thread id是否和gui_thread的thread id一致,
+// 结论: 是一致的, 意味着future并不开启另一个线程去执行任务
 void test_packaged_task() {
     std::thread t1([&]{
+        std::cout << "thread t1 id=" << std::this_thread::get_id() << std::endl;
         MsgAction m[] = {
             MsgAction("hello"), MsgAction("C++"), MsgAction("concurrency")
         };

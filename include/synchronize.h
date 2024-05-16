@@ -6,6 +6,7 @@
 #include <mutex>
 #include <condition_variable>
 #include <chrono>
+#include <list>
 
 struct data_chunk;
 extern std::queue<data_chunk> data_queue;
