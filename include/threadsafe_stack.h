@@ -45,7 +45,7 @@ ThreadSafeStack<T>::ThreadSafeStack(int* begin, int* end) {
 template <typename T>
 void ThreadSafeStack<T>::push(T value) {
     std::lock_guard<std::mutex> lk(m);
-    stack_t.push(value);
+    stack_t.push(std::move(value));
 }
 
 // 直接返回object，可能会有潜在的copy constructor抛异常的问题;

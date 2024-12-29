@@ -50,6 +50,11 @@ add_executable(test_synchronize
   src/synchronize/time.cc
 )
 
+add_executable(test_lockfree
+  test/test_lockfree.cc
+  src/lockfree/lockfree_stack.cc
+)
+
 target_link_libraries(
   test_thread_mgr
   GTest::gtest_main
@@ -62,8 +67,14 @@ target_link_libraries(
   test_synchronize
   GTest::gtest_main
 )
+target_link_libraries(
+  test_lockfree
+  GTest::gtest_main
+)
 
 # enable CMake's test google test module and enable test discovery
 include(GoogleTest)
 gtest_discover_tests(test_thread_mgr)
 gtest_discover_tests(test_share_data)
+gtest_discover_tests(test_synchronize)
+gtest_discover_tests(test_lockfree)

@@ -88,7 +88,7 @@ std::list<T> parallel_quicksort(std::list<T> input) {
         return t < pivot;
     });
     std::list<T> lower_part;
-    lower_part.splice(lower_part.begin(), input, input.begin(), divide_point);
+    lower_part.splice(lower_part.end(), input, input.begin(), divide_point);
     std::future<std::list<T>> new_lower(std::async(&parallel_quicksort<T>, std::move(lower_part)));
     auto new_higher(parallel_quicksort(std::move(input)));
     result.splice(result.end(), new_higher);
