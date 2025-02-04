@@ -53,6 +53,7 @@ add_executable(test_synchronize
 add_executable(test_lockfree
   test/test_lockfree.cc
   src/lockfree/lockfree_stack.cc
+  src/lockfree/lockfree_queue.cc
 )
 
 target_link_libraries(
