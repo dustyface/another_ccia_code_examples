@@ -39,15 +39,18 @@ TEST(test_lockfree, test_refcount_queue) {
     });
     std::thread tb([&] {
         int b[] = {200};
-        push_queue_item(b, 1, false);
+        push_queue_item(b, 1, true);
     });
     ta.join();
     tb.join();
+    print_queue();
     std::cout << "queue start poping..." << std::endl;
-    std::thread tc([&] {
+    std::thread tx([&] {
         pop_queue_item(1);
     });
-    std::thread td([&] {
+    std::thread ty([&] {
         pop_queue_item(1);
     });
+    tx.join();
+    ty.join();
 }

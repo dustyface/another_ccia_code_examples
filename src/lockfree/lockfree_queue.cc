@@ -10,9 +10,14 @@ void push_queue_item(int items[], size_t size, bool use_pause) {
 
 void pop_queue_item(int sz) {
     for (int i=0; i<sz; i++) {
-        std::cout << "pop_queue_item: i=" << i << std::endl;
         std::unique_ptr<int> res = queue.pop();
         if (res)
             std::cout << "poped item=" << *res << std::endl;
     }
+}
+
+void print_queue() {
+    unsigned int n = queue.get_external_count();
+    std::cout << "queue external count=" << n << std::endl;
+    queue.print_queue();
 }
