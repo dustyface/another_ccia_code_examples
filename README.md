@@ -1,4 +1,4 @@
-# C++ Concurrency In Action 2ed Companian Source Code
+# C++ Concurrency In Action 2ed Companion Source Code
 
 > 目前进展到完成了第7章
 
