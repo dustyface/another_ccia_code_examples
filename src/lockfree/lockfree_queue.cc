@@ -17,7 +17,5 @@ void pop_queue_item(int sz) {
 }
 
 void print_queue() {
-    unsigned int n = queue.get_external_count();
-    std::cout << "queue external count=" << n << std::endl;
     queue.print_queue();
 }

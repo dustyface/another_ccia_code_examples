@@ -8,7 +8,7 @@
     << #label << ", thread_id=" << std::this_thread::get_id() << std::endl;
 #define PRINT(x) \
     std::cout << __LINE__ << " " << __FUNCTION__ << "(): " \
-    << #x << "=" << x << std::endl
+    << #x << "=" << (x) << std::endl
 
 template <typename T>
 class lock_free_queue {
@@ -66,6 +66,7 @@ private:
             PRINT_THREADID("after loop");
             PRINT(new_counter.internal_count);
             PRINT(new_counter.external_counters);
+            PRINT(new_counter.internal_count == new_counter.external_counters);
 
             if (!new_counter.internal_count && !new_counter.external_counters) {
                 delete this;
@@ -96,6 +97,8 @@ private:
         PRINT(tmp_counter.ptr);
         PRINT(old_counter.external_count);
         PRINT(old_counter.ptr);
+        PRINT(new_counter.ptr);
+        PRINT(new_counter.external_count);
     }
 
     /**
@@ -139,18 +142,14 @@ private:
 
         counted_node_ptr tmp_tail = tail.load();
         PRINT_THREADID("before loop:");
-        PRINT(tmp_tail.ptr);
-        PRINT(tmp_tail.external_count);
-        PRINT(old_tail.ptr);
-        PRINT(old_tail.external_count);
         PRINT(new_tail.ptr);
-        PRINT(new_tail.external_count);
+        PRINT(old_tail.ptr);
+        PRINT(tail.load().ptr);
 
         while (!tail.compare_exchange_weak(old_tail, new_tail) && old_tail.ptr == current_tail_ptr);
 
         PRINT_THREADID("after loop");
-        PRINT(old_tail.ptr);
-        PRINT(current_tail_ptr);
+        PRINT(old_tail.ptr == current_tail_ptr);
 
         if (old_tail.ptr == current_tail_ptr) {
             free_external_counter(old_tail);
@@ -170,10 +169,6 @@ public:
 
     ~lock_free_queue() {
         while (pop());
-    }
-
-    unsigned int get_external_count() {
-        return head.load().external_count;
     }
 
     void print_queue() {
@@ -200,6 +195,8 @@ public:
         counted_node_ptr new_next;
         new_next.ptr = new node;
         new_next.external_count = 1;
+        PRINT_THREADID("check new_next.ptr");
+        PRINT(new_next.ptr);
         counted_node_ptr old_tail = tail.load();
 
         PRINT_THREADID("pushing: "); PRINT(*new_data);
@@ -227,6 +224,12 @@ public:
                 PRINT(*tmp_data);
                 PRINT(tmp_next.ptr);
                 PRINT(tmp_next.external_count);
+
+                if (use_pause) {
+                    PRINT_THREADID("about to pause");
+                    std::this_thread::sleep_for(std::chrono::milliseconds(1000));
+                    PRINT_THREADID("resume from pause");
+                }
                 // 1. 当old_tail.ptr->next和old_next相等, 意味着next的状态就是node constructor所创建的默认状态(next.external=0, next.ptr=nullptr,标记为没有用户数据的状态)，和old_next完全一致。即意味着，此时还没有加入新的tail node，应该exchange为new_next(即为push 新的counted_node_ptr节点)
                // 2. 当old_taial.ptr->next和old_next不相等(进入if branch)，next表示已经由其他线程推入的counted_node_ptr节点
                 if (!old_tail.ptr->next.compare_exchange_strong(old_next, new_next)) {
@@ -235,11 +238,7 @@ public:
                     delete new_next.ptr;
                     new_next = old_next;
                 }
-                if (use_pause) {
-                    PRINT_THREADID("about to pause");
-                    std::this_thread::sleep_for(std::chrono::milliseconds(1000));
-                    PRINT_THREADID("resume from pause");
-                }
+
                 set_new_tail(old_tail, new_next);
                 new_data.release();
                 break;
@@ -252,8 +251,12 @@ public:
                 // 2. 当old_tail.ptr->next和old_next不等, 则说明还存在其他线程推入的next counted_node_ptr object, 将old_next替换为old_tail.ptr->next的值后，不执行if内语句, 直接调用set_new_tail, 将tail设定成next所指向的object
                 if (old_tail.ptr->next.compare_exchange_strong(old_next,new_next)) {
                     PRINT_THREADID("else branch: old_tail.ptr->next is replaced by new_next");
+                    PRINT(old_next.ptr);
+                    PRINT(new_next.ptr);
                     old_next = new_next;
                     new_next.ptr = new node;
+                    PRINT(old_next.ptr);
+                    PRINT(new_next.ptr);
                 }
                 set_new_tail(old_tail, old_next);
                 // 执行完后， 继续执行for loop, 在去判断tail的ptr->data是否有值否, 决定进入哪个分支;
